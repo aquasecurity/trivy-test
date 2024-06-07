@@ -16,8 +16,9 @@ jobs:
           fetch-depth: 0
 
       - name: Extract branch name
+        env:
+          COMMENT: ${{ toJSON(github.event.comment) }}
         run: |
-          echo " ${{ github.event.issue.pull_request }}"
-          echo " ${{ github.event.issue.pull_request.merged_at }}"
-          echo " ${{ github.event.comment.body }}"
-          echo " ${{ github.event.comment.author_association }}"
+          echo "github.event.issue.pull_request:  ${{ github.event.issue.pull_request }}"
+          echo "github.event.issue.pull_request.merged_at: ${{ github.event.issue.pull_request.merged_at }}"
+          echo "github.event.comment: $COMMENT"
