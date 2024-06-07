@@ -26,6 +26,7 @@ jobs:
 
   backport:
     name: Backport PR
+    needs: check_permission # run this job after checking permissions
     if: |
       needs.check_permission.outputs.is_maintainer == 'true' &&      
       github.event.issue.pull_request &&
