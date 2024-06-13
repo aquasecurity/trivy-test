@@ -4,7 +4,7 @@ on:
 jobs:
   check-bats-version:
     runs-on:
-      groups: Trivy Larger Runners
+      groups: "Trivy Larger Runners"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
