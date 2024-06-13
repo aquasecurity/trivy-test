@@ -1,5 +1,5 @@
 <div align="center">
-<img src="docs/imgs/logo.png" width="200">
+<img src="docs/imgs/logo.png" width="200"> 
 
 [![GitHub Release][release-img]][release]
 [![Test][test-img]][test]
