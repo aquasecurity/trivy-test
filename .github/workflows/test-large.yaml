@@ -1,0 +1,14 @@
+name: test large runner
+on:
+  workflow_dispatch:
+jobs:
+  check-bats-version:
+    runs-on:
+      labels: ubuntu-latest-m
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '14'
+      - run: npm install -g bats
+      - run: bats -v
