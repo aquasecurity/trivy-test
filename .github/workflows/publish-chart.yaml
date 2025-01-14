@@ -4,6 +4,11 @@ name: Publish Helm chart
 on:
   workflow_dispatch:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
     branches:
       - main
     paths:
@@ -18,7 +23,9 @@ env:
   KIND_VERSION: "v0.14.0"
   KIND_IMAGE: "kindest/node:v1.23.6@sha256:b1fa224cc6c7ff32455e0b1fd9cbfd3d3bc87ecaa8fcb06961ed1afb3db0f9ae"
 jobs:
+  # `test-chart` job starts if a PR with Helm Chart is created, merged etc.
   test-chart:
+    if: github.event_name != 'push'
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
@@ -48,40 +55,40 @@ jobs:
           sed -i -e '136s,false,'true',g' ./helm/trivy/values.yaml
           ct lint-and-install --validate-maintainers=false --charts helm/trivy
 
-  publish-chart:
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    needs:
-      - test-chart
+  # `update-chart-version` job starts if a new tag is pushed
+  update-chart-version:
+    if: github.event_name == 'push'
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.6
         with:
           fetch-depth: 0
-      - name: Install chart-releaser
+      - name: Set up Git user
         run: |
-          wget https://github.com/helm/chart-releaser/releases/download/v1.3.0/chart-releaser_1.3.0_linux_amd64.tar.gz
-          echo "baed2315a9bb799efb71d512c5198a2a3b8dcd139d7f22f878777cffcd649a37  chart-releaser_1.3.0_linux_amd64.tar.gz" | sha256sum -c -
-          tar xzvf chart-releaser_1.3.0_linux_amd64.tar.gz cr
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Install tools
+        uses: aquaproj/aqua-installer@v3.0.1
+        with:
+          aqua_version: v1.25.0
+          aqua_opts: ""
+
+      - name: Create a PR with Trivy version
+        run: mage helm:updateVersion
+        env:
+          # Use ORG_REPO_TOKEN instead of GITHUB_TOKEN
+          # This allows the created PR to trigger tests and other workflows
+          GITHUB_TOKEN: ${{ secrets.ORG_REPO_TOKEN }}
+
+  # `publish-chart` job starts if a PR with a new Helm Chart is merged or manually
+  publish-chart:
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    needs:
+      - test-chart
+    runs-on: ubuntu-20.04
+    steps:
       - name: Package helm chart
         run: |
-          ./cr package ${{ env.CHART_DIR }}
-      - name: Upload helm chart
-        # Failed with upload the same version: https://github.com/helm/chart-releaser/issues/101
-        continue-on-error: true
-        run: |
-          ./cr upload -o ${{ env.GH_OWNER }} -r ${{ env.HELM_REP }} --token ${{ secrets.ORG_REPO_TOKEN }} -p .cr-release-packages
-      - name: Index helm chart
-        run: |
-          ./cr index -o ${{ env.GH_OWNER }} -r ${{ env.HELM_REP }} -c https://${{ env.GH_OWNER }}.github.io/${{ env.HELM_REP }}/ -i index.yaml
-      - name: Push index file
-        uses: dmnemec/copy_file_to_another_repo_action@c93037aa10fa8893de271f19978c980d0c1a9b37 #v1.1.1
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.ORG_REPO_TOKEN }}
-        with:
-          source_file: 'index.yaml'
-          destination_repo: '${{ env.GH_OWNER }}/${{ env.HELM_REP }}'
-          destination_folder: '.'
-          destination_branch: 'gh-pages'
-          user_email: aqua-bot@users.noreply.github.com
-          user_name: 'aqua-bot'
+          echo "publish-chart job starts"
