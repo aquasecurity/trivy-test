@@ -1,0 +1,21 @@
+name: Test release branch
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-release-branch:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.6
+      - name: Set up Git user
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+
+      - name: test PR for aqua
+        run: gh pr create --head "test/release-check-aqua" --base "release/v0.58" --title "title" --body "desciprion" --repo "DmitriyLewen/trivy"
+        env:
+          GH_TOKEN: ${{ github.token }}
