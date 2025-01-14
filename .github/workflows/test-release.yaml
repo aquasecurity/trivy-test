@@ -18,4 +18,4 @@ jobs:
       - name: test PR for aqua
         run: gh pr create --head "test/release-check-aqua" --base "release/v0.58" --title "title" --body "desciprion" --repo "aquasecurity/trivy-test"
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.ORG_REPO_TOKEN }}
