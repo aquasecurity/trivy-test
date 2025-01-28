@@ -16,6 +16,8 @@ Trivy has *scanners* that look for security issues, and *targets* where it can f
 
 Targets (what Trivy can scan):
 
+
+
 - Container Image
 - Filesystem
 - Git Repository (remote)
