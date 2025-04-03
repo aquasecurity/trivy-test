@@ -64,6 +64,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.1.6
         with:
+          # Checkout the main branch to get the latest chart version, that was changed after the previous release
+          # It needs for correctly updating the chart version of patch releases
+          ref: main
           fetch-depth: 0
 
       - name: Set up Git user

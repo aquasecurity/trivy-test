@@ -35,7 +35,6 @@ func main() {
 		trivyVersion, newHelmVersion)
 
 	cmds := [][]string{
-		[]string{"git", "checkout", "main"},
 		[]string{"git", "switch", "-c", newBranch},
 		[]string{"git", "add", chartFile},
 		[]string{"git", "commit", "-m", title},
