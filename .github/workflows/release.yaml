@@ -7,11 +7,10 @@ on:
 jobs:
   release:
     name: Release
-    uses: ./.github/workflows/reusable-release.yaml
-    with:
-      goreleaser_config: goreleaser.yml
-      goreleaser_options: '--clean --timeout 90m'
-    secrets: inherit
+    steps:
+      - name: do release
+        run: |
+          echo "Released!"
 
   deploy-packages:
     name: Deploy rpm/dep packages
@@ -22,12 +21,6 @@ jobs:
         uses: actions/checkout@v4.1.6
         with:
           fetch-depth: 0
-
-      - name: Restore Trivy binaries from cache
-        uses: actions/cache@v4
-        with:
-          path: dist/
-          key: ${{ runner.os }}-bins-${{github.workflow}}-${{github.sha}}
 
       - name: Install dependencies
         run: |
@@ -48,10 +41,37 @@ jobs:
           git config --global user.name "Teppei Fukuda"
 
       - name: Create rpm repository
-        run: ci/deploy-rpm.sh
+        run: cd trivy-repo/deb
 
-      - name: Import GPG key
-        run: echo -e "${{ secrets.GPG_KEY }}" | gpg --import
+  # `update-chart-version` creates a new PR for updating the helm chart
+  update-chart-version:
+    needs: deploy-packages
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.6
+        with:
+          # Checkout the main branch to get the latest chart version, that was changed after the previous release
+          # It needs for correctly updating the chart version of patch releases
+          ref: main
+          fetch-depth: 0
 
-      - name: Create deb repository
-        run: ci/deploy-deb.sh
+      - name: Set up Git user
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Install Go tools
+        run: go install tool # GOBIN is added to the PATH by the setup-go action
+
+      - name: Create a PR with Trivy version
+        run: mage helm:updateVersion
+        env:
+          # Use ORG_REPO_TOKEN instead of GITHUB_TOKEN
+          # This allows the created PR to trigger tests and other workflows
+          GITHUB_TOKEN: ${{ secrets.ORG_REPO_TOKEN }}
