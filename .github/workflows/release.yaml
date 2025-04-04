@@ -9,11 +9,10 @@ env:
 jobs:
   release:
     name: Release
-    uses: ./.github/workflows/reusable-release.yaml
-    with:
-      goreleaser_config: goreleaser.yml
-      goreleaser_options: '--clean --timeout 90m'
-    secrets: inherit
+    runs-on: ${{ env.RUNNER_OS }}
+    steps:
+      - name: Releasing
+        run: echo "RELEASED!!!"
 
   deploy-packages:
     name: Deploy rpm/dep packages
@@ -25,38 +24,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore Trivy binaries from cache
-        uses: actions/cache@v4
-        with:
-          path: dist/
-          key: ${{ runner.os }}-bins-${{github.workflow}}-${{github.sha}}
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get -y update
-          sudo apt-get -y install rpm reprepro createrepo-c distro-info
-
-      - name: Checkout trivy-repo
-        uses: actions/checkout@v4.1.6
-        with:
-          repository: ${{ github.repository_owner }}/trivy-repo
-          path: trivy-repo
-          fetch-depth: 0
-          token: ${{ secrets.ORG_REPO_TOKEN }}
-
       - name: Setup git settings
         run: |
           git config --global user.email "knqyf263@gmail.com"
           git config --global user.name "Teppei Fukuda"
 
-      - name: Create rpm repository
-        run: ci/deploy-rpm.sh
-
-      - name: Import GPG key
-        run: echo -e "${{ secrets.GPG_KEY }}" | gpg --import
-
       - name: Create deb repository
-        run: ci/deploy-deb.sh
+        run: cd trivy-repo/deb
 
   # `update-chart-version` creates a new PR for updating the helm chart
   update-chart-version:
