@@ -119,20 +119,41 @@ jobs:
           TYPES_REGEX=$(echo "$VALID_TYPES" | grep -v '^$' | paste -sd '|')
           SCOPES_REGEX=$(echo "$VALID_SCOPES" | grep -v '^$' | grep -v '^#' | paste -sd '|')
           
-          # Regular expression for conventional commits format
-          # Format: <type>(<scope>): <description> or <type>: <description>
-          # Also allows for breaking changes with '!'
-          CONVENTIONAL_COMMIT_REGEX="^(${TYPES_REGEX})(\(${SCOPES_REGEX}\))?!?: .+$"
-          
-          if ! echo "$PR_TITLE" | grep -qE "$CONVENTIONAL_COMMIT_REGEX"; then
-            echo "Error: PR title does not follow Conventional Commits format"
+          # Basic format check (should match: type(scope): description or type: description)
+          FORMAT_REGEX="^[a-z]+(\([a-z0-9+]+\))?!?: .+$"
+          if ! echo "$PR_TITLE" | grep -qE "$FORMAT_REGEX"; then
+            echo "Error: Invalid PR title format"
             echo "Expected format: <type>(<scope>): <description> or <type>: <description>"
-            echo -e "\nValid types:"
-            echo "$VALID_TYPES" | grep -v '^$' | sed 's/^/- /'
-            echo -e "\nValid scopes:"
-            echo "$VALID_SCOPES" | grep -v '^$' | grep -v '^#' | sed 's/^/- /'
+            echo "Examples:"
+            echo "  feat(vuln): add new vulnerability detection"
+            echo "  fix: correct parsing logic"
+            echo "  docs(kubernetes): update installation guide"
             echo -e "\nCurrent title: $PR_TITLE"
             exit 1
+          fi
+
+          # Extract type and scope for validation
+          TYPE=$(echo "$PR_TITLE" | sed -E 's/^([a-z]+)(\([a-z0-9+]+\))?!?: .+$/\1/')
+          SCOPE=$(echo "$PR_TITLE" | sed -E 's/^[a-z]+\(([a-z0-9+]+)\)!?: .+$/\1/; t; s/.*//')
+
+          # Validate type
+          if ! echo "$VALID_TYPES" | grep -qx "$TYPE"; then
+            echo "Error: Invalid type '${TYPE}'"
+            echo -e "\nValid types:"
+            echo "$VALID_TYPES" | grep -v '^$' | sed 's/^/- /'
+            echo -e "\nCurrent title: $PR_TITLE"
+            exit 1
+          fi
+
+          # Validate scope if present
+          if [ -n "$SCOPE" ]; then
+            if ! echo "$VALID_SCOPES" | grep -v '^#' | grep -qx "$SCOPE"; then
+              echo "Error: Invalid scope '${SCOPE}'"
+              echo -e "\nValid scopes:"
+              echo "$VALID_SCOPES" | grep -v '^$' | grep -v '^#' | sed 's/^/- /'
+              echo -e "\nCurrent title: $PR_TITLE"
+              exit 1
+            fi
           fi
           
           echo "PR title validation passed ✅"
