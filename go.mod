@@ -1,6 +1,6 @@
 module github.com/aquasecurity/trivy
 
-go 1.24
+go 1.24.2
 
 require (
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible
@@ -415,6 +415,8 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
 )
 
+require github.com/aquasecurity/trivy-enterprise v0.0.0-00010101000000-000000000000
+
 require (
 	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/aws/aws-sdk-go v1.55.6 // indirect
@@ -451,3 +453,5 @@ tool (
 	golang.org/x/tools/cmd/goyacc
 	sigs.k8s.io/kind
 )
+
+replace github.com/aquasecurity/trivy-enterprise => ./enterprise
