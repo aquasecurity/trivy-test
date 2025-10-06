@@ -29,20 +29,6 @@ func formatDBMetadata(title string, meta metadata.Metadata) string {
 `, title, meta.Version, meta.UpdatedAt.UTC(), meta.NextUpdate.UTC(), meta.DownloadedAt.UTC())
 }
 
-func (v *VersionInfo) String() string {
-	output := fmt.Sprintf("Version: %s\n", v.Version)
-	if v.VulnerabilityDB != nil {
-		output += formatDBMetadata("Vulnerability DB", *v.VulnerabilityDB)
-	}
-	if v.JavaDB != nil {
-		output += formatDBMetadata("Java DB", *v.JavaDB)
-	}
-	if v.CheckBundle != nil {
-		output += v.CheckBundle.String()
-	}
-	return output
-}
-
 func NewVersionInfo(cacheDir string) VersionInfo {
 	var dbMeta *metadata.Metadata
 	var javadbMeta *metadata.Metadata
