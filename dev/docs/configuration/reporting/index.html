@@ -2853,6 +2853,33 @@ You're not viewing the latest version of the documentation.
   
   
     <li class="md-nav__item">
+      <a href="../../coverage/os/coreos/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    CoreOS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../coverage/os/debian/" class="md-nav__link">
         
   
@@ -3979,6 +4006,33 @@ You're not viewing the latest version of the documentation.
     
   
     Root.io Images
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../coverage/others/seal/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    
+  
+    Seal Security
   
 
     
@@ -8653,6 +8707,12 @@ Total: 1 (UNKNOWN: 0, LOW: 0, MEDIUM: 1, HIGH: 0, CRITICAL: 0)
 </ul>
 </li>
 </ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For the secret/license scanner, the Trivy report contains only findings.
+Therefore, we can’t say for sure whether Trivy scanned at least one file or simply didn’t find any findings.
+That’s why, for these scanners, the summary table uses “-” if no findings are found.</p>
+</div>
 <details>
 <summary>Report Summary</summary>
 
@@ -9277,17 +9337,12 @@ Here is an example:</p>
 For more details, please check <a href="../../plugin/user-guide/#output-mode-support">here</a>.</p>
 <h2 id="converting">Converting<a class="headerlink" href="#converting" title="Permanent link">&para;</a></h2>
 <p>To generate multiple reports, you can generate the JSON report first and convert it to other formats with the <code>convert</code> subcommand.</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>trivy<span class="w"> </span>image<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>-o<span class="w"> </span>result.json<span class="w"> </span>--list-all-pkgs<span class="w"> </span>debian:11
+<div class="highlight"><pre><span></span><code>$<span class="w"> </span>trivy<span class="w"> </span>image<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>-o<span class="w"> </span>result.json<span class="w"> </span>debian:11
 $<span class="w"> </span>trivy<span class="w"> </span>convert<span class="w"> </span>--format<span class="w"> </span>cyclonedx<span class="w"> </span>--output<span class="w"> </span>result.cdx<span class="w"> </span>result.json
 </code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Please note that if you want to convert to a format that requires a list of packages,
-such as SBOM, you need to add the <code>--list-all-pkgs</code> flag when outputting in JSON.</p>
-</div>
 <p><a href="../filtering/">Filtering options</a> such as <code>--severity</code> are also available with <code>convert</code>.</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Output all severities in JSON</span>
-$<span class="w"> </span>trivy<span class="w"> </span>image<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>-o<span class="w"> </span>result.json<span class="w"> </span>--list-all-pkgs<span class="w"> </span>debian:11
+$<span class="w"> </span>trivy<span class="w"> </span>image<span class="w"> </span>--format<span class="w"> </span>json<span class="w"> </span>-o<span class="w"> </span>result.json<span class="w"> </span>debian:11
 
 <span class="c1"># Output only critical issues in table format</span>
 $<span class="w"> </span>trivy<span class="w"> </span>convert<span class="w"> </span>--format<span class="w"> </span>table<span class="w"> </span>--severity<span class="w"> </span>CRITICAL<span class="w"> </span>result.json
