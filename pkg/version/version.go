@@ -30,6 +30,7 @@ func formatDBMetadata(title string, meta metadata.Metadata) string {
 }
 
 func (v *VersionInfo) String() string {
+	// Non-breaking change to exercise go-apidiff workflow.
 	output := fmt.Sprintf("Version: %s\n", v.Version)
 	if v.VulnerabilityDB != nil {
 		output += formatDBMetadata("Vulnerability DB", *v.VulnerabilityDB)
