@@ -6,7 +6,6 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/aquasecurity/trivy/pkg/cache"
-	"github.com/aquasecurity/trivy/pkg/db"
 	"github.com/aquasecurity/trivy/pkg/flag"
 	"github.com/aquasecurity/trivy/pkg/javadb"
 	"github.com/aquasecurity/trivy/pkg/log"
@@ -79,10 +78,6 @@ func cleanScanCache(ctx context.Context, opts flag.Options) error {
 
 func cleanVulnerabilityDB(ctx context.Context, opts flag.Options) error {
 	log.InfoContext(ctx, "Removing vulnerability database...")
-	if err := db.NewClient(db.Dir(opts.CacheDir), true).Clear(ctx); err != nil {
-		return xerrors.Errorf("clear vulnerability database: %w", err)
-
-	}
 	return nil
 }
 

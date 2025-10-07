@@ -189,13 +189,6 @@ func (c *Client) Download(ctx context.Context, dst string, opt types.RegistryOpt
 	return nil
 }
 
-func (c *Client) Clear(_ context.Context) error {
-	if err := os.RemoveAll(c.dbDir); err != nil {
-		return xerrors.Errorf("failed to remove vulnerability database: %w", err)
-	}
-	return nil
-}
-
 func (c *Client) updateDownloadedAt(ctx context.Context, dbDir string) error {
 	log.Debug("Updating database metadata...")
 
