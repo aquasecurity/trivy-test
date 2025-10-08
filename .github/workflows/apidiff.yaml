@@ -17,10 +17,13 @@ jobs:
     runs-on: ubuntu-24.04
     name: API Diff Check
     steps:
+      # Checkout PR merge commit to compare against base branch
+      # This ensures we compare the actual merge result with the base branch,
+      # avoiding false positives when PR is not rebased with latest main
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
 
       - name: Set up Go
         uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
@@ -28,13 +31,9 @@ jobs:
           go-version-file: go.mod
           cache: false
 
-      # Ensure the base commit exists locally when checkout uses depth=1 (default).
-      - name: Fetch base commit
-        run: |
-          BASE_REF="${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}"
-          if [ -n "$BASE_REF" ]; then
-            git fetch --depth=1 origin "$BASE_REF"
-          fi
+      # Note: When using merge commit ref, the base commit is already included in the merge,
+      # so we don't need to fetch it separately. The go-apidiff action will compare
+      # the base.sha (which is the parent of the merge commit) with the current HEAD (merge commit).
 
       # NOTE: go-apidiff is not managed in go.mod because installing it via `go get -tool`
       # would cause `mage tool:install` to attempt building it on Windows, which currently
