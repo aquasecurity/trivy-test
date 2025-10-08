@@ -808,3 +808,10 @@ func usedFlags(fg FlagGroup) []Flagger {
 	}
 	return flags
 }
+
+// TestAPIForApidiff is a test function added to verify apidiff workflow.
+// This function will be used to test that the apidiff workflow correctly
+// handles cases where new APIs are added to main after a PR branch is created.
+func TestAPIForApidiff() string {
+	return "test-api-for-apidiff-workflow"
+}
