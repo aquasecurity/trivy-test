@@ -1,5 +1,5 @@
 // Package flag provides flag definitions and parsing for Trivy CLI.
-// This package contains the implementation of command-line flags and configuration options.
+// This is a conflicting change to test merge conflict detection.
 package flag
 
 import (
