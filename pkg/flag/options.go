@@ -1,3 +1,5 @@
+// Package flag provides flag definitions and parsing for Trivy CLI.
+// This package contains the implementation of command-line flags and configuration options.
 package flag
 
 import (
