@@ -20,6 +20,14 @@ jobs:
     runs-on: ubuntu-24.04
     name: API Diff Check
     steps:
+      # Check if PR has conflicts. When conflicts exist, the merge commit becomes
+      # frozen at an old state and apidiff cannot run correctly.
+      - name: Check for merge conflicts
+        if: ${{ github.event.pull_request.mergeable == false }}
+        run: |
+          echo "::error::This PR has merge conflicts. Please resolve conflicts before running apidiff."
+          exit 1
+
       # Checkout PR merge commit to compare against base branch
       # This ensures we compare the actual merge result with the base branch,
       # avoiding false positives when PR is not rebased with latest main
