@@ -90,7 +90,7 @@ type Alias struct {
 	Deprecated bool
 }
 
-func (f *Flag[T]) Clone() *Flag[T] {
+func (f *Flag[T]) Clone(testParam string) *Flag[T] {
 	var t T
 	ff := *f
 	ff.value = t
