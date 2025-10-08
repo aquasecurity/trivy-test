@@ -189,13 +189,6 @@ func (c *Client) Download(ctx context.Context, dst string, opt types.RegistryOpt
 	return nil
 }
 
-func (c *Client) Clear(_ context.Context) error {
-	if err := os.RemoveAll(c.dbDir); err != nil {
-		return xerrors.Errorf("failed to remove vulnerability database: %w", err)
-	}
-	return nil
-}
-
 func (c *Client) updateDownloadedAt(ctx context.Context, dbDir string) error {
 	log.Debug("Updating database metadata...")
 
@@ -231,15 +224,5 @@ func (c *Client) downloadDB(ctx context.Context, opt types.RegistryOptions, dst 
 	if err := c.initArtifacts(opt).Download(ctx, dst, downloadOpt); err != nil {
 		return xerrors.Errorf("failed to download vulnerability DB: %w", err)
 	}
-	return nil
-}
-
-func (c *Client) ShowInfo() error {
-	meta, err := c.metadata.Get()
-	if err != nil {
-		return xerrors.Errorf("something wrong with DB: %w", err)
-	}
-	log.Debug("DB info", log.Int("schema", meta.Version), log.Time("updated_at", meta.UpdatedAt),
-		log.Time("next_update", meta.NextUpdate), log.Time("downloaded_at", meta.DownloadedAt))
 	return nil
 }
